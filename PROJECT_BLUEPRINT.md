@@ -18,7 +18,7 @@
 **Goal**: Deploy event-driven AWS infrastructure as code
 
 #### Tasks:
-- [ ] **CDK Project Setup** (30 min)
+- [x] **CDK Project Setup** (30 min)
   - Initialize TypeScript CDK project
   - Configure AWS credentials and region
   - Set up project structure
