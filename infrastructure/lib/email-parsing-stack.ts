@@ -185,7 +185,7 @@ export class EmailParsingStack extends cdk.Stack {
     // Email Processor Lambda (receives emails from S3)
     const emailProcessorLambda = new lambda.Function(this, 'EmailProcessorLambda', {
       functionName: 'email-processor',
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         exports.handler = async (event) => {
@@ -206,7 +206,7 @@ export class EmailParsingStack extends cdk.Stack {
     // Email Parser Lambda (processes emails with Bedrock)
     const emailParserLambda = new lambda.Function(this, 'EmailParserLambda', {
       functionName: 'email-parser',
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         exports.handler = async (event) => {
@@ -227,7 +227,7 @@ export class EmailParsingStack extends cdk.Stack {
     // Supplier Matcher Lambda (Strategy pattern matching)
     const supplierMatcherLambda = new lambda.Function(this, 'SupplierMatcherLambda', {
       functionName: 'supplier-matcher',
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         exports.handler = async (event) => {
@@ -256,6 +256,10 @@ export class EmailParsingStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, 'EmailParsingAPI', {
       restApiName: 'Email Parsing API',
       description: 'API for email parsing and supplier suggestions',
+      deployOptions: {
+        stageName: 'dev',
+        description: 'Development stage for email parsing API',
+      },
       defaultCorsPreflightOptions: {
         allowOrigins: ['*'], // TODO: Restrict to Vercel domain in production
         allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -266,7 +270,7 @@ export class EmailParsingStack extends cdk.Stack {
     // API Gateway integration lambda
     const apiLambda = new lambda.Function(this, 'APILambda', {
       functionName: 'email-parsing-api',
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         exports.handler = async (event) => {

@@ -84,7 +84,7 @@ aws s3 cp gsa-generic-rfi.eml s3://email-parsing-mvp-619326977873-us-west-1/emai
 ### Monitor Processing:
 - Check CloudWatch logs for Lambda function execution
 - Query DynamoDB `parsed-emails` table for extracted data
-- Test API endpoints for supplier suggestions
+- Test API endpoints for supplier suggestions: `https://4vmhy4gwei.execute-api.us-west-1.amazonaws.com/dev/`
 
 ### Expected JSON Output Example (SEWP):
 ```json

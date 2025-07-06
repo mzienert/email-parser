@@ -40,7 +40,7 @@
 
 **🎉 DEPLOYMENT SUCCESS:**
 - **S3 Bucket**: `email-parsing-mvp-619326977873-us-west-1`
-- **API Gateway**: `https://4vmhy4gwei.execute-api.us-west-1.amazonaws.com/prod/`
+- **API Gateway**: `https://4vmhy4gwei.execute-api.us-west-1.amazonaws.com/dev/`
 - **EventBridge Bus**: `email-parsing-events`
 - **DynamoDB Tables**: `parsed-emails`, `supplier-catalog`
 - **Lambda Functions**: Email processor, parser, supplier matcher, API handler
