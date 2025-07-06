@@ -1,0 +1,117 @@
+Return-Path: <procurement@nasa.gov>
+Received: from mail.nasa.gov ([10.0.1.50]) by mail.contractor.com with ESMTP
+	id abcdef12-3456-7890-abcd-ef1234567890; Wed, 15 May 2025 14:45:00 -0500
+Date: Wed, 15 May 2025 14:45:00 -0500
+From: NASA SEWP Team <procurement@nasa.gov>
+To: sewp-contractors@lists.nasa.gov
+Subject: NASA SEWP Team - Request for Quote #NASA-2025-001 - Enterprise Network Infrastructure
+Message-ID: <20250515194500.nasa001@nasa.gov>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+NASA SEWP PROCUREMENT NOTICE
+============================
+
+Dear SEWP Contract Holders,
+
+The National Aeronautics and Space Administration (NASA) is seeking quotations 
+for enterprise network infrastructure equipment under our SEWP V contract vehicle.
+
+PROCUREMENT DETAILS:
+-------------------
+RFQ Number: NASA-2025-001
+Issuing Office: NASA Goddard Space Flight Center
+Project: Mission Critical Network Upgrade
+Classification: Unclassified
+
+TIMELINE:
+---------
+RFQ Issue Date: May 15, 2025
+Questions Due: May 29, 2025 at 2:00 PM EDT
+Quotes Due: June 12, 2025 at 4:00 PM EDT
+
+TECHNICAL REQUIREMENTS:
+----------------------
+We require enterprise-grade networking equipment including:
+
+1. Core Network Switches (Qty: 12)
+   - 48-port Gigabit Ethernet
+   - 10G uplink capabilities
+   - Redundant power supplies
+   - FIPS 140-2 Level 2 certification required
+
+2. Edge Routers (Qty: 8) 
+   - BGP routing capability
+   - IPv6 support mandatory
+   - Space-qualified components preferred
+   - Security compliance: NIST 800-53
+
+3. Wireless Access Points (Qty: 150)
+   - Wi-Fi 6E standard
+   - Federal security requirements
+   - Centralized management system
+
+SPECIAL REQUIREMENTS:
+--------------------
+- All equipment must be TAA compliant
+- Security clearance may be required for installation
+- CONUS manufacturing preference
+- Energy Star certification required
+- 24/7 technical support with 4-hour response time
+
+DELIVERY REQUIREMENTS:
+---------------------
+Primary Delivery Location:
+NASA Goddard Space Flight Center
+8800 Greenbelt Road
+Greenbelt, MD 20771
+
+Secondary Locations:
+- NASA Johnson Space Center, Houston, TX
+- NASA Kennedy Space Center, FL
+
+EVALUATION CRITERIA:
+-------------------
+This procurement will be evaluated using Lowest Price Technically Acceptable (LPTA) methodology.
+
+Technical factors include:
+- Compliance with all stated requirements
+- Technical specifications and performance
+- Past performance with federal agencies
+- Delivery schedule adherence
+
+POINTS OF CONTACT:
+-----------------
+Technical Questions: tech.support@nasa.gov
+Contracting Questions: contracts@nasa.gov
+
+Primary Contracting Officer:
+Dr. Sarah Mitchell
+NASA GSFC Procurement Office
+sarah.mitchell@nasa.gov
+Phone: (301) 286-5555
+
+SUBMISSION INSTRUCTIONS:
+-----------------------
+Submit quotes electronically through the NASA SEWP portal at:
+https://sewp.nasa.gov/submissions
+
+Please reference RFQ #NASA-2025-001 in all communications.
+
+This solicitation is set aside for small business concerns under NAICS 334210.
+HUBZone and Service-Disabled Veteran-Owned Small Business (SDVOSB) 
+participants are encouraged to submit quotes.
+
+Thank you for your continued partnership with NASA SEWP.
+
+Best regards,
+
+NASA SEWP Procurement Team
+Solutions for Enterprise-Wide Procurement
+National Aeronautics and Space Administration
+
+============================================================================
+This message contains procurement sensitive information. Distribution is 
+limited to authorized SEWP contract holders only.
+============================================================================ 

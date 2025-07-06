@@ -27,7 +27,7 @@ export class EmailParsingStack extends cdk.Stack {
     
     // S3 Bucket for email storage
     const emailBucket = new s3.Bucket(this, 'EmailStorageBucket', {
-      bucketName: `email-parsing-storage-${this.account}-${this.region}`,
+      bucketName: `email-parsing-mvp-${this.account}-${this.region}`,
       versioned: true,
       lifecycleRules: [
         {
@@ -53,23 +53,24 @@ export class EmailParsingStack extends cdk.Stack {
     // EMAIL RECEIVING INFRASTRUCTURE
     // =============================================================================
     
-    // SES Receipt Rule Set (requires domain verification)
-    const ruleSet = new ses.ReceiptRuleSet(this, 'EmailReceiptRuleSet', {
-      receiptRuleSetName: 'email-parsing-rules',
-    });
+    // TODO: SES Receipt Rule Set (requires domain verification)
+    // Commented out for MVP - would need verified domain
+    // const ruleSet = new ses.ReceiptRuleSet(this, 'EmailReceiptRuleSet', {
+    //   receiptRuleSetName: 'email-parsing-rules',
+    // });
 
-    // SES Receipt Rule to store emails in S3
-    const emailReceiptRule = new ses.ReceiptRule(this, 'EmailReceiptRule', {
-      ruleSet: ruleSet,
-      recipients: ['*'], // Accept all emails (TODO: Configure specific domains)
-      actions: [
-        new sesActions.S3({
-          bucket: emailBucket,
-          objectKeyPrefix: 'emails/',
-        }),
-      ],
-      enabled: true,
-    });
+    // TODO: SES Receipt Rule to store emails in S3
+    // const emailReceiptRule = new ses.ReceiptRule(this, 'EmailReceiptRule', {
+    //   ruleSet: ruleSet,
+    //   recipients: ['test@yourdomain.com'], // Would need verified domain
+    //   actions: [
+    //     new sesActions.S3({
+    //       bucket: emailBucket,
+    //       objectKeyPrefix: 'emails/',
+    //     }),
+    //   ],
+    //   enabled: true,
+    // });
 
     // =============================================================================
     // EVENT INFRASTRUCTURE
