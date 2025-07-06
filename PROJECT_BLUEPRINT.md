@@ -23,15 +23,15 @@
   - Configure AWS credentials and region
   - Set up project structure
 
-- [ ] **Core AWS Resources** (90 min)
-  - [ ] SES email receiving configuration
-  - [ ] S3 bucket for email storage
-  - [ ] EventBridge custom event bus
-  - [ ] SQS queues (parse, match, process)
-  - [ ] DynamoDB tables (emails, suppliers, matches)
-  - [ ] Lambda function scaffolding with Bedrock runtime dependencies
-  - [ ] API Gateway setup
-  - [ ] IAM roles and policies (including Bedrock InvokeModel permissions)
+- [x] **Core AWS Resources** (90 min)
+  - [x] SES email receiving configuration
+  - [x] S3 bucket for email storage
+  - [x] EventBridge custom event bus
+  - [x] SQS queues (parse, match, process)
+  - [x] DynamoDB tables (emails, suppliers, matches)
+  - [x] Lambda function scaffolding with Bedrock runtime dependencies
+  - [x] API Gateway setup
+  - [x] IAM roles and policies (including Bedrock InvokeModel permissions)
 
 #### Deliverables:
 - ✅ CDK stack deploys successfully
