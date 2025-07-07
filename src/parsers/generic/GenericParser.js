@@ -1,4 +1,4 @@
-const IBidParser = require('./IBidParser');
+const IBidParser = require('../IBidParser');
 
 /**
  * GenericParser - Fallback parser for unstructured government procurement emails

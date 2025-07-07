@@ -1,4 +1,4 @@
-const IBidParser = require('./IBidParser');
+const IBidParser = require('../IBidParser');
 
 /**
  * NASAParser - Specialized parser for NASA procurement emails

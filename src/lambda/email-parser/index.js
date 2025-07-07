@@ -2,7 +2,7 @@ const { BedrockRuntimeClient } = require('@aws-sdk/client-bedrock-runtime');
 const { EventBridgeClient, PutEventsCommand } = require('@aws-sdk/client-eventbridge');
 const { successResponse, errorResponse } = require('/opt/nodejs/response');
 const logger = require('/opt/nodejs/logger');
-const BidParserFactory = require('./BidParserFactory');
+const BidParserFactory = require('/opt/nodejs/factory/BidParserFactory');
 
 // Initialize AWS clients
 const bedrockClient = new BedrockRuntimeClient({ 

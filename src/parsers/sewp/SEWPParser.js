@@ -1,4 +1,4 @@
-const IBidParser = require('./IBidParser');
+const IBidParser = require('../IBidParser');
 
 /**
  * SEWPParser - Specialized parser for SEWP (Solutions for Enterprise-Wide Procurement) emails

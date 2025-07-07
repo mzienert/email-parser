@@ -51,6 +51,29 @@ export class LambdaConstruct extends Construct {
       description: 'Shared utilities for email parsing Lambda functions (logger, response helpers)',
     });
 
+    // Create Lambda Layer for parsers and factory
+    const parsersLayer = new lambda.LayerVersion(this, 'ParsersLayer', {
+      layerVersionName: 'email-parsing-parsers',
+      code: lambda.Code.fromAsset('../src', {
+        bundling: {
+          image: lambda.Runtime.NODEJS_20_X.bundlingImage,
+          user: 'root',
+          command: [
+            'bash', '-c', [
+              'mkdir -p /asset-output/nodejs',
+              'cp -r /asset-input/parsers /asset-output/nodejs/',
+              'cp -r /asset-input/factory /asset-output/nodejs/',
+              'cd /asset-output/nodejs',
+              'npm init -y',
+              'npm install'
+            ].join(' && ')
+          ]
+        }
+      }),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
+      description: 'Email parsing parsers and factory (SEWP, NASA, Generic parsers)',
+    });
+
     // Bedrock IAM policy for Lambda functions
     const bedrockPolicy = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
@@ -88,7 +111,7 @@ export class LambdaConstruct extends Construct {
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('../src/lambda/email-parser'),
-      layers: [utilitiesLayer],
+      layers: [utilitiesLayer, parsersLayer],
       timeout: cdk.Duration.minutes(5),
       memorySize: 1024,
       environment: {

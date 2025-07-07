@@ -1,6 +1,6 @@
-const SEWPParser = require('./SEWPParser');
-const NASAParser = require('./NASAParser');
-const GenericParser = require('./GenericParser');
+const SEWPParser = require('../parsers/sewp/SEWPParser');
+const NASAParser = require('../parsers/nasa/NASAParser');
+const GenericParser = require('../parsers/generic/GenericParser');
 
 /**
  * BidParserFactory - Factory pattern implementation for email parser selection
