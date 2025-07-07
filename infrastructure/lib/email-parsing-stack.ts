@@ -110,5 +110,16 @@ export class EmailParsingStack extends cdk.Stack {
       value: database.supplierTable.tableName,
       description: 'DynamoDB table name for supplier catalog',
     });
+
+    // Debug outputs for EventBridge and SQS
+    new cdk.CfnOutput(this, 'EmailParseQueueUrl', {
+      value: queues.emailParseQueue.queueUrl,
+      description: 'SQS Email Parse Queue URL',
+    });
+
+    new cdk.CfnOutput(this, 'EmailReceivedRuleName', {
+      value: triggers.emailReceivedRule.ruleName,
+      description: 'EventBridge rule name for email received events',
+    });
   }
 }
