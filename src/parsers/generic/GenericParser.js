@@ -1,4 +1,5 @@
 const IBidParser = require('../IBidParser');
+const BedrockHelper = require('/opt/nodejs/bedrockHelper');
 
 /**
  * GenericParser - Fallback parser for unstructured government procurement emails
@@ -335,16 +336,122 @@ class GenericParser extends IBidParser {
    * @returns {Promise<Object>} Bedrock extracted data
    */
   async extractBedrockFields(emailData) {
-    // TODO: Implement Bedrock integration in next step
-    // Generic parser relies more heavily on Bedrock for unstructured content
-    return {
-      keyTopics: [],
-      budgetRange: null,
-      performancePeriod: null,
-      evaluationCriteria: [],
-      submissionInstructions: [],
-      bedrockConfidence: 0.0
-    };
+    try {
+      // Define the expected response format for generic government procurement extraction
+      const responseFormat = {
+        keyTopics: ["Main topics or themes discussed in the email"],
+        procurementDetails: {
+          procurementType: "Type of procurement (RFP, RFQ, RFI, IFB, BAA)",
+          solicitationNumber: "Full solicitation or reference number",
+          agency: "Government agency issuing the procurement",
+          office: "Specific office or department within agency",
+          contractVehicle: "Contract vehicle if mentioned (GSA, SEWP, etc.)"
+        },
+        requirementsAndSpecs: {
+          technicalRequirements: ["Technical specifications and requirements"],
+          functionalRequirements: ["Functional capabilities required"],
+          performanceStandards: ["Performance standards or metrics"],
+          complianceRequirements: ["Regulatory or compliance requirements"]
+        },
+        businessInformation: {
+          setAsideType: "Small business set-aside type if applicable",
+          businessCertifications: ["Required business certifications"],
+          eligibilityRequirements: ["Vendor eligibility requirements"],
+          minimumQualifications: ["Minimum vendor qualifications"]
+        },
+        budgetAndCost: {
+          estimatedValue: "Contract estimated value or budget",
+          budgetRange: "Budget range if provided",
+          costStructure: "How costs should be structured or presented",
+          fundingSource: "Source of funding if mentioned"
+        },
+        submissionRequirements: {
+          proposalDueDate: "Proposal submission deadline",
+          questionsDueDate: "Questions submission deadline",
+          submissionMethod: "How to submit proposals",
+          requiredDocuments: ["Required documents or sections"],
+          formatRequirements: ["Formatting or presentation requirements"]
+        },
+        evaluationCriteria: {
+          evaluationFactors: ["Factors used to evaluate proposals"],
+          evaluationMethod: "Evaluation method (LPTA, best value, etc.)",
+          scoringWeights: "Scoring weights if provided",
+          awardCriteria: "Criteria for award decision"
+        },
+        contactInformation: {
+          contractingOfficer: "Contracting officer name and contact",
+          technicalContact: "Technical point of contact",
+          businessContact: "Business/administrative contact",
+          questionProcess: "Process for submitting questions"
+        },
+        timelineAndDelivery: {
+          performancePeriod: "Contract performance period",
+          deliverySchedule: "Delivery timeline or milestones",
+          keyDates: ["Important dates and deadlines"],
+          awardDate: "Expected award date"
+        }
+      };
+
+      // Construct the extraction prompt
+      const prompt = BedrockHelper.constructExtractionPrompt(
+        emailData,
+        this.getParserType(),
+        responseFormat
+      );
+
+      // Invoke Bedrock model - Generic parser relies heavily on Bedrock for unstructured content
+      const extractedData = await BedrockHelper.invokeModel(
+        this.bedrockClient,
+        prompt,
+        BedrockHelper.MODELS.CLAUDE_3_7_SONNET,
+        {
+          temperature: 0.1,
+          maxTokens: 4000
+        }
+      );
+
+      // Validate extraction results
+      const validation = BedrockHelper.validateBedrockExtraction(
+        extractedData,
+        this.getParserType()
+      );
+
+      console.log('Generic Bedrock extraction completed:', {
+        emailId: emailData.emailId,
+        confidence: extractedData.bedrockConfidence,
+        validationPassed: validation.isValid,
+        extractedFields: Object.keys(extractedData).filter(k => 
+          !k.startsWith('bedrock') && extractedData[k] !== null && extractedData[k] !== undefined
+        )
+      });
+
+      return {
+        ...extractedData,
+        bedrockValidation: validation
+      };
+
+    } catch (error) {
+      console.error('Generic Bedrock extraction failed:', {
+        emailId: emailData.emailId,
+        error: error.message
+      });
+
+      // Return fallback structure with error information
+      return {
+        keyTopics: [],
+        procurementDetails: {},
+        requirementsAndSpecs: {},
+        businessInformation: {},
+        budgetAndCost: {},
+        submissionRequirements: {},
+        evaluationCriteria: {},
+        contactInformation: {},
+        timelineAndDelivery: {},
+        bedrockError: error.message,
+        bedrockConfidence: 0.0,
+        bedrockProcessedAt: new Date().toISOString()
+      };
+    }
   }
 
   /**

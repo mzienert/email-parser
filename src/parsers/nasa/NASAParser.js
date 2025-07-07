@@ -1,4 +1,5 @@
 const IBidParser = require('../IBidParser');
+const BedrockHelper = require('/opt/nodejs/bedrockHelper');
 
 /**
  * NASAParser - Specialized parser for NASA procurement emails
@@ -387,15 +388,113 @@ class NASAParser extends IBidParser {
    * @returns {Promise<Object>} Bedrock extracted data
    */
   async extractBedrockFields(emailData) {
-    // TODO: Implement Bedrock integration in next step
-    // For now, return placeholder structure
-    return {
-      spaceMissionContext: null,
-      budgetConstraints: {},
-      vendorQualifications: [],
-      riskAssessment: {},
-      bedrockConfidence: 0.0
-    };
+    try {
+      // Define the expected response format for NASA-specific extraction
+      const responseFormat = {
+        spaceMissionContext: {
+          missionType: "Type of space mission (exploration, research, operational)",
+          missionName: "Specific mission name if mentioned",
+          spacecraft: "Target spacecraft or platform",
+          launchDate: "Planned launch date if specified",
+          missionDuration: "Mission length or operational period"
+        },
+        advancedTechnicalRequirements: {
+          spaceQualification: ["Space qualification standards required"],
+          radiationTolerance: "Radiation hardening requirements",
+          temperatureRange: "Operating temperature requirements",
+          vibrationTesting: "Vibration and shock testing requirements",
+          outgassingLimits: "Outgassing specifications"
+        },
+        securityAndCompliance: {
+          clearanceLevel: "Required security clearance level",
+          itarRequirements: "ITAR compliance requirements",
+          exportControlRequirements: ["Export control restrictions"],
+          dataSecurityRequirements: ["Data handling and security requirements"]
+        },
+        budgetAndCost: {
+          estimatedValue: "Contract estimated value",
+          costBreakdown: "How costs should be structured",
+          budgetConstraints: "Budget limitations mentioned",
+          fundingSource: "Source of funding (NASA, DoD, etc.)"
+        },
+        vendorQualifications: {
+          requiredCertifications: ["Required vendor certifications"],
+          experienceRequired: "Experience requirements",
+          facilityRequirements: ["Facility or infrastructure requirements"],
+          personnelRequirements: ["Required personnel qualifications"]
+        },
+        deliveryAndPerformance: {
+          criticalDeliveryDates: ["Key milestone dates"],
+          deliveryLocation: "NASA facility for delivery",
+          testingRequirements: ["Testing and validation requirements"],
+          acceptanceCriteria: ["Criteria for acceptance"]
+        },
+        riskAssessment: {
+          missionCriticalElements: ["Elements critical to mission success"],
+          riskMitigationRequirements: ["Risk mitigation strategies required"],
+          failureConsequences: "Consequences of component failure",
+          redundancyRequirements: "Redundancy or backup requirements"
+        }
+      };
+
+      // Construct the extraction prompt
+      const prompt = BedrockHelper.constructExtractionPrompt(
+        emailData,
+        this.getParserType(),
+        responseFormat
+      );
+
+      // Invoke Bedrock model
+      const extractedData = await BedrockHelper.invokeModel(
+        this.bedrockClient,
+        prompt,
+        BedrockHelper.MODELS.CLAUDE_3_7_SONNET,
+        {
+          temperature: 0.1,
+          maxTokens: 4000
+        }
+      );
+
+      // Validate extraction results
+      const validation = BedrockHelper.validateBedrockExtraction(
+        extractedData,
+        this.getParserType()
+      );
+
+      console.log('NASA Bedrock extraction completed:', {
+        emailId: emailData.emailId,
+        confidence: extractedData.bedrockConfidence,
+        validationPassed: validation.isValid,
+        extractedFields: Object.keys(extractedData).filter(k => 
+          !k.startsWith('bedrock') && extractedData[k] !== null && extractedData[k] !== undefined
+        )
+      });
+
+      return {
+        ...extractedData,
+        bedrockValidation: validation
+      };
+
+    } catch (error) {
+      console.error('NASA Bedrock extraction failed:', {
+        emailId: emailData.emailId,
+        error: error.message
+      });
+
+      // Return fallback structure with error information
+      return {
+        spaceMissionContext: {},
+        advancedTechnicalRequirements: {},
+        securityAndCompliance: {},
+        budgetAndCost: {},
+        vendorQualifications: {},
+        deliveryAndPerformance: {},
+        riskAssessment: {},
+        bedrockError: error.message,
+        bedrockConfidence: 0.0,
+        bedrockProcessedAt: new Date().toISOString()
+      };
+    }
   }
 
   /**

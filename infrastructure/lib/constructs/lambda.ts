@@ -51,6 +51,28 @@ export class LambdaConstruct extends Construct {
       description: 'Shared utilities for email parsing Lambda functions (logger, response helpers)',
     });
 
+    // Create Lambda Layer for Bedrock integration
+    const bedrockLayer = new lambda.LayerVersion(this, 'BedrockLayer', {
+      layerVersionName: 'email-parsing-bedrock',
+      code: lambda.Code.fromAsset('../src/bedrock', {
+        bundling: {
+          image: lambda.Runtime.NODEJS_20_X.bundlingImage,
+          user: 'root',
+          command: [
+            'bash', '-c', [
+              'mkdir -p /asset-output/nodejs',
+              'cp -r /asset-input/* /asset-output/nodejs/',
+              'cd /asset-output/nodejs',
+              'npm init -y',
+              'npm install @aws-sdk/client-bedrock-runtime'
+            ].join(' && ')
+          ]
+        }
+      }),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
+      description: 'Bedrock LLM integration utilities for email parsing',
+    });
+
     // Create Lambda Layer for parsers and factory
     const parsersLayer = new lambda.LayerVersion(this, 'ParsersLayer', {
       layerVersionName: 'email-parsing-parsers',
@@ -82,9 +104,9 @@ export class LambdaConstruct extends Construct {
         'bedrock:InvokeModelWithResponseStream',
       ],
       resources: [
-        `arn:aws:bedrock:${props.region}::foundation-model/us.anthropic.claude-3-7-sonnet-20250219-v1:0`,
-        `arn:aws:bedrock:${props.region}::foundation-model/us.anthropic.claude-4-sonnet-20241022-v1:0`,
-        `arn:aws:bedrock:${props.region}::foundation-model/us.anthropic.claude-4-opus-20241022-v1:0`,
+        `arn:aws:bedrock:${props.region}::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0`,
+        `arn:aws:bedrock:${props.region}::foundation-model/anthropic.claude-4-sonnet-20241022-v1:0`,
+        `arn:aws:bedrock:${props.region}::foundation-model/anthropic.claude-4-opus-20241022-v1:0`,
       ],
     });
 
@@ -111,7 +133,7 @@ export class LambdaConstruct extends Construct {
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('../src/lambda/email-parser'),
-      layers: [utilitiesLayer, parsersLayer],
+      layers: [utilitiesLayer, bedrockLayer, parsersLayer],
       timeout: cdk.Duration.minutes(5),
       memorySize: 1024,
       environment: {

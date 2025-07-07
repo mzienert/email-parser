@@ -1,5 +1,6 @@
 /**
  * Logger utility for structured logging across Lambda functions
+ * Updated: 2025-07-07 to force utilities layer rebuild
  */
 
 const LOG_LEVELS = {

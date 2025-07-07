@@ -1,4 +1,5 @@
 const IBidParser = require('../IBidParser');
+const BedrockHelper = require('/opt/nodejs/bedrockHelper');
 
 /**
  * SEWPParser - Specialized parser for SEWP (Solutions for Enterprise-Wide Procurement) emails
@@ -201,15 +202,101 @@ class SEWPParser extends IBidParser {
    * @returns {Promise<Object>} Bedrock extracted data
    */
   async extractBedrockFields(emailData) {
-    // TODO: Implement Bedrock integration in next step
-    // For now, return placeholder structure
-    return {
-      brandRestrictions: [],
-      technicalSpecifications: [],
-      deliveryRequirements: {},
-      evaluationCriteria: [],
-      bedrockConfidence: 0.0
-    };
+    try {
+      // Define the expected response format for SEWP-specific extraction
+      const responseFormat = {
+        brandRestrictions: ["Array of brand names if specific brands are required"],
+        technicalSpecifications: {
+          hardware: ["Hardware requirements"],
+          software: ["Software requirements"],
+          performance: ["Performance criteria"],
+          compatibility: ["Compatibility requirements"]
+        },
+        deliveryRequirements: {
+          deliveryLocation: "Delivery address or facility",
+          deliveryTimeframe: "Timeline for delivery",
+          installationRequired: "Boolean for installation services",
+          supportRequired: "Support/maintenance requirements"
+        },
+        evaluationCriteria: ["How proposals will be evaluated"],
+        budgetInformation: {
+          estimatedValue: "Contract value if mentioned",
+          budgetRange: "Budget range if provided",
+          costFactors: ["Cost evaluation factors"]
+        },
+        additionalRequirements: ["Any other requirements not captured above"],
+        keyDates: {
+          proposalDueDate: "When proposals are due",
+          questionsDueDate: "When questions are due",
+          awardDate: "Expected award date"
+        },
+        pointOfContact: {
+          name: "Contact person name",
+          email: "Contact email",
+          phone: "Contact phone",
+          role: "Their role/title"
+        }
+      };
+
+      // Construct the extraction prompt
+      const prompt = BedrockHelper.constructExtractionPrompt(
+        emailData,
+        this.getParserType(),
+        responseFormat
+      );
+
+      // Invoke Bedrock model
+      const extractedData = await BedrockHelper.invokeModel(
+        this.bedrockClient,
+        prompt,
+        BedrockHelper.MODELS.CLAUDE_3_7_SONNET,
+        {
+          temperature: 0.1,
+          maxTokens: 4000
+        }
+      );
+
+      // Validate extraction results
+      const validation = BedrockHelper.validateBedrockExtraction(
+        extractedData,
+        this.getParserType()
+      );
+
+      console.log('SEWP Bedrock extraction completed:', {
+        emailId: emailData.emailId,
+        confidence: extractedData.bedrockConfidence,
+        validationPassed: validation.isValid,
+        extractedFields: Object.keys(extractedData).filter(k => 
+          !k.startsWith('bedrock') && extractedData[k] !== null && extractedData[k] !== undefined
+        )
+      });
+
+      return {
+        ...extractedData,
+        bedrockValidation: validation
+      };
+
+    } catch (error) {
+      console.error('SEWP Bedrock extraction failed:', {
+        emailId: emailData.emailId,
+        error: error.message
+      });
+
+      // Return fallback structure with error information
+      return {
+        brandRestrictions: [],
+        technicalSpecifications: {},
+        deliveryRequirements: {},
+        evaluationCriteria: [],
+        budgetInformation: {},
+        additionalRequirements: [],
+        keyDates: {},
+        pointOfContact: {},
+        bedrockError: error.message,
+        bedrockConfidence: 0.0,
+        bedrockProcessedAt: new Date().toISOString()
+      };
+    }
   }
 
   /**

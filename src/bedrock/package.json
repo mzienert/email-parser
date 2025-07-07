@@ -1,0 +1,12 @@
+{
+  "name": "email-parsing-bedrock-layer",
+  "version": "1.0.0",
+  "description": "Bedrock LLM integration utilities for email parsing",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.0.0"
+  },
+  "keywords": ["bedrock", "aws", "lambda", "layer"],
+  "author": "Email Parser Project",
+  "license": "MIT"
+} 
