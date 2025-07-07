@@ -24,8 +24,8 @@
   - Set up project structure
 
 - [x] **Core AWS Resources** (90 min)
-  - [x] SES email receiving configuration
-  - [x] S3 bucket for email storage
+  - [x] ~~SES email receiving configuration~~ (Bypassed - domain verification required)
+  - [x] S3 bucket for email storage with direct .eml upload capability
   - [x] EventBridge custom event bus
   - [x] SQS queues (parse, match, process)
   - [x] DynamoDB tables (emails, suppliers, matches)
@@ -52,6 +52,7 @@
 - **NASA Email**: `test-data/nasa-networking-rfq.eml` (space/security requirements)
 - **Generic GSA Email**: `test-data/gsa-generic-rfi.eml` (unstructured format)
 - **Factory Pattern Test**: Each email designed to trigger different parser types
+- **SES Decision**: Bypassed SES due to domain verification requirements; using direct S3 upload for MVP testing
 
 ---
 
@@ -60,8 +61,8 @@
 
 #### Tasks:
 - [ ] **Email Ingestion Lambda** (60 min)
-  - [ ] SES → S3 trigger handler
-  - [ ] Email metadata extraction
+  - [ ] S3 object creation trigger handler (bypassing SES for MVP)
+  - [ ] .eml file parsing and metadata extraction
   - [ ] EventBridge event publishing
 
 - [ ] **Factory Pattern Implementation** (120 min)
@@ -206,12 +207,14 @@
 ### ✅ Implemented Decisions:
 - **Event-Driven Architecture**: SQS/EventBridge for scalability (interview focus)
 - **Infrastructure as Code**: CDK for maintainability
+- **S3-Direct Email Processing**: Bypassed SES due to domain verification requirements for MVP
 - **Factory Pattern Parsers**: SEWPParser, NASAParser, GenericParser with Bedrock hybrid implementations
 - **Amazon Bedrock Integration**: Claude-powered content extraction across all parser types
 - **Strategy Pattern Matching**: Multi-algorithm supplier matching with compliance filtering
 - **Vercel Frontend**: Fast deployment and iteration
 
 ### ⚠️ Strategic Deferrals:
+- **SES Email Receiving**: Domain verification required (using S3 direct upload for MVP)
 - **Advanced ML Matching**: Vector embeddings, historical success scoring (basic multi-strategy implemented)
 - **Full Parser Implementations**: Complete SEWP/NASA logic (basic Factory pattern demonstrated)
 - **Dead Letter Queue Implementation**: Configured but not fully implemented

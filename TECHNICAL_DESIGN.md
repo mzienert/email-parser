@@ -18,13 +18,16 @@ This document outlines the design for an intelligent email parsing system that u
 
 ### Refined Architecture Flow
 ```
-SES Email Reception → S3 Storage → EventBridge → SQS Queues → Lambda Processors → DynamoDB → API Gateway → React/Vercel UI
+S3 Email Upload (.eml) → S3 Event Trigger → EventBridge → SQS Queues → Lambda Processors → DynamoDB → API Gateway → React/Vercel UI
 ```
+
+**Note**: SES bypassed for MVP due to domain verification requirements. Direct S3 upload enables immediate testing with .eml files.
 
 ### Core Components
 
 #### 1.1 Email Ingestion Pipeline
-- **AWS SES**: Receives emails from multiple government sources
+- **~~AWS SES~~**: Bypassed for MVP due to domain verification requirements
+- **S3 Direct Upload**: Direct .eml file upload to `/emails/` prefix for testing
 - **S3 Bucket**: Immutable email storage with lifecycle policies
 - **EventBridge**: Central event routing and orchestration
 - **SQS Queues**: Reliable message processing with error handling
