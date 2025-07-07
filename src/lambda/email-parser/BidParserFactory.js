@@ -1,7 +1,6 @@
 const SEWPParser = require('./SEWPParser');
-// TODO: Import other parsers as they're implemented
-// const NASAParser = require('./NASAParser');
-// const GenericParser = require('./GenericParser');
+const NASAParser = require('./NASAParser');
+const GenericParser = require('./GenericParser');
 
 /**
  * BidParserFactory - Factory pattern implementation for email parser selection
@@ -50,11 +49,7 @@ class BidParserFactory {
     // Apply minimum confidence threshold
     if (selectedParser.score < 0.1) {
       console.warn('All parsers have very low confidence, defaulting to GenericParser');
-      // TODO: Implement GenericParser fallback
-      // return new GenericParser(bedrockClient);
-      
-      // For now, use SEWP parser as fallback
-      return new SEWPParser(bedrockClient);
+      return new GenericParser(bedrockClient);
     }
 
     return new selectedParser.ParserClass(bedrockClient);
@@ -67,9 +62,8 @@ class BidParserFactory {
   static getAvailableParserTypes() {
     return [
       SEWPParser,
-      // TODO: Add other parsers as they're implemented
-      // NASAParser,
-      // GenericParser
+      NASAParser,
+      GenericParser
     ];
   }
 
@@ -82,9 +76,8 @@ class BidParserFactory {
   static createParserByType(parserType, bedrockClient) {
     const parserMap = {
       'SEWP': SEWPParser,
-      // TODO: Add other parsers as they're implemented
-      // 'NASA': NASAParser,
-      // 'GENERIC': GenericParser
+      'NASA': NASAParser,
+      'GENERIC': GenericParser
     };
 
     const ParserClass = parserMap[parserType.toUpperCase()];
