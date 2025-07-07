@@ -1,7 +1,7 @@
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { EventBridgeClient, PutEventsCommand } = require('@aws-sdk/client-eventbridge');
-const { successResponse, errorResponse, processingResponse } = require('../../utilities/response');
-const logger = require('../../utilities/logger');
+const { successResponse, errorResponse, processingResponse } = require('/opt/nodejs/response');
+const logger = require('/opt/nodejs/logger');
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 const eventBridge = new EventBridgeClient({ region: process.env.AWS_REGION });

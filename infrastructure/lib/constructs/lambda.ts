@@ -29,6 +29,28 @@ export class LambdaConstruct extends Construct {
   constructor(scope: Construct, id: string, props: LambdaConstructProps) {
     super(scope, id);
 
+    // Create Lambda Layer for shared utilities
+    const utilitiesLayer = new lambda.LayerVersion(this, 'UtilitiesLayer', {
+      layerVersionName: 'email-parsing-utilities',
+      code: lambda.Code.fromAsset('../src/utilities', {
+        bundling: {
+          image: lambda.Runtime.NODEJS_20_X.bundlingImage,
+          user: 'root',
+          command: [
+            'bash', '-c', [
+              'mkdir -p /asset-output/nodejs',
+              'cp -r /asset-input/* /asset-output/nodejs/',
+              'cd /asset-output/nodejs',
+              'npm init -y',
+              'npm install'
+            ].join(' && ')
+          ]
+        }
+      }),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
+      description: 'Shared utilities for email parsing Lambda functions (logger, response helpers)',
+    });
+
     // Bedrock IAM policy for Lambda functions
     const bedrockPolicy = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
@@ -49,6 +71,7 @@ export class LambdaConstruct extends Construct {
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('../src/lambda/email-processor'),
+      layers: [utilitiesLayer],
       timeout: cdk.Duration.minutes(5),
       memorySize: 512,
       environment: {
