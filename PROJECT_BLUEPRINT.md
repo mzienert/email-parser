@@ -38,13 +38,14 @@
 - ✅ Event infrastructure ready
 - ✅ Dead Letter Queues acknowledged in code
 
-**🎉 DEPLOYMENT SUCCESS:**
+**🎉 DEPLOYMENT SUCCESS (Modular Architecture):**
 - **S3 Bucket**: `email-parsing-mvp-619326977873-us-west-2`
-- **API Gateway**: `https://hpu2b2hej9.execute-api.us-west-2.amazonaws.com/dev/`
+- **API Gateway**: `https://ms3d3yxove.execute-api.us-west-2.amazonaws.com/dev/`
 - **EventBridge Bus**: `email-parsing-events`
 - **DynamoDB Tables**: `parsed-emails`, `supplier-catalog`
 - **Lambda Functions**: Email processor, parser, supplier matcher, API handler
 - **SQS Queues**: Parse, match, process queues with DLQ error handling
+- **Architecture**: 8 modular constructs with single responsibility principles
 
 **✅ TEST DATA READY:**
 - **SEWP V Email**: `test-data/sewp-nutanix-rfq.eml` (structured, machine-readable)
