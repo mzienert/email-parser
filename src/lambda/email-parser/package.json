@@ -1,0 +1,23 @@
+{
+  "name": "email-parser",
+  "version": "1.0.0",
+  "description": "Lambda function to parse government emails using Factory pattern and Bedrock LLM integration",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.0.0",
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/client-eventbridge": "^3.0.0",
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0"
+  },
+  "keywords": [
+    "lambda",
+    "email",
+    "parser",
+    "bedrock",
+    "factory-pattern",
+    "government-contracting"
+  ],
+  "author": "Email Parser System",
+  "license": "MIT"
+} 

@@ -87,18 +87,14 @@ export class LambdaConstruct extends Construct {
       functionName: 'email-parser',
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        exports.handler = async (event) => {
-          console.log('Email parser lambda triggered:', JSON.stringify(event, null, 2));
-          // TODO: Implement Factory pattern parser with Bedrock integration
-          return { statusCode: 200, body: 'Email parsed' };
-        };
-      `),
+      code: lambda.Code.fromAsset('../src/lambda/email-parser'),
+      layers: [utilitiesLayer],
       timeout: cdk.Duration.minutes(5),
       memorySize: 1024,
       environment: {
         SUPPLIER_MATCH_QUEUE_URL: props.supplierMatchQueue.queueUrl,
         EMAIL_TABLE_NAME: props.emailTable.tableName,
+        EVENT_BUS_NAME: props.emailEventBus.eventBusName,
         BEDROCK_REGION: props.region,
         BEDROCK_MODEL_ID: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
       },
