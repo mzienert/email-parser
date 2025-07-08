@@ -1,0 +1,191 @@
+{
+  "supplierSchema": {
+    "supplierId": "string (primary key)",
+    "companyName": "string",
+    "duns": "string",
+    "cageCode": "string",
+    "contact": {
+      "primaryContact": {
+        "name": "string",
+        "title": "string",
+        "email": "string",
+        "phone": "string"
+      },
+      "technicalContact": {
+        "name": "string",
+        "title": "string", 
+        "email": "string",
+        "phone": "string"
+      },
+      "contractsContact": {
+        "name": "string",
+        "title": "string",
+        "email": "string", 
+        "phone": "string"
+      }
+    },
+    "businessCertifications": [
+      "HUBZone",
+      "SDVOSB", 
+      "WOSB",
+      "8(a)",
+      "SDB",
+      "VET"
+    ],
+    "complianceStatus": "string (GSI key - 'TAA_COMPLIANT', 'EPEAT_CERTIFIED', 'FULL_COMPLIANT')",
+    "complianceDetails": {
+      "taaCompliant": "boolean",
+      "epeatLevels": ["Bronze", "Silver", "Gold"],
+      "securityClearance": ["C", "CSAT", "CNET", "CSOFT"],
+      "federalContractHistory": "boolean",
+      "governmentCertifications": ["FedRAMP", "FISMA", "NIST"]
+    },
+    "capabilities": [
+      "string (GSI key - 'NUTANIX_RESELLER', 'NETWORKING_HARDWARE', 'SOFTWARE_LICENSING')"
+    ],
+    "authorizedReseller": {
+      "nutanix": "boolean",
+      "cisco": "boolean", 
+      "dell": "boolean",
+      "hp": "boolean",
+      "microsoft": "boolean",
+      "vmware": "boolean"
+    },
+    "geographicCapabilities": {
+      "state": "string (GSI key)",
+      "regions": ["string"],
+      "deliveryLocations": ["string"],
+      "supportCoverage": "string (24/7, Business Hours, Regional)"
+    },
+    "pastPerformance": {
+      "governmentContracts": [
+        {
+          "contractNumber": "string",
+          "agency": "string",
+          "value": "number",
+          "performancePeriod": "string",
+          "rating": "string (Exceptional, Very Good, Satisfactory)"
+        }
+      ],
+      "sewpExperience": "boolean",
+      "nasaExperience": "boolean",
+      "gsaSchedule": "string"
+    },
+    "businessInfo": {
+      "businessSize": "string (Large, Small)",
+      "employeeCount": "number",
+      "annualRevenue": "number",
+      "foundedYear": "number",
+      "headquarters": {
+        "address": "string",
+        "city": "string",
+        "state": "string",
+        "zip": "string"
+      }
+    },
+    "technicalCapabilities": {
+      "supportLevel": "string (24/7 Federal, Business Hours, Best Effort)",
+      "installationCapability": "boolean",
+      "maintenanceCapability": "boolean",
+      "trainingCapability": "boolean",
+      "customizationCapability": "boolean"
+    },
+    "metadata": {
+      "createdAt": "string (ISO timestamp)",
+      "updatedAt": "string (ISO timestamp)",
+      "lastVerified": "string (ISO timestamp)",
+      "dataSource": "string (manual, api, import)",
+      "status": "string (active, inactive, pending)"
+    }
+  },
+  "sampleSupplierRecord": {
+    "supplierId": "SUPP-001-NUTANIX-RESELLER",
+    "companyName": "Federal Tech Solutions LLC",
+    "duns": "123456789",
+    "cageCode": "1A2B3",
+    "contact": {
+      "primaryContact": {
+        "name": "John Smith",
+        "title": "Government Sales Director",
+        "email": "john.smith@federaltech.com",
+        "phone": "555-123-4567"
+      },
+      "technicalContact": {
+        "name": "Sarah Johnson",
+        "title": "Technical Lead",
+        "email": "sarah.johnson@federaltech.com", 
+        "phone": "555-123-4568"
+      },
+      "contractsContact": {
+        "name": "Mike Davis",
+        "title": "Contracts Manager",
+        "email": "mike.davis@federaltech.com",
+        "phone": "555-123-4569"
+      }
+    },
+    "businessCertifications": ["HUBZone", "SDVOSB"],
+    "complianceStatus": "FULL_COMPLIANT",
+    "complianceDetails": {
+      "taaCompliant": true,
+      "epeatLevels": ["Bronze", "Silver", "Gold"],
+      "securityClearance": ["C", "CSAT"],
+      "federalContractHistory": true,
+      "governmentCertifications": ["FedRAMP", "FISMA"]
+    },
+    "capabilities": ["NUTANIX_RESELLER", "HYPER_CONVERGED_INFRASTRUCTURE", "24_7_SUPPORT"],
+    "authorizedReseller": {
+      "nutanix": true,
+      "cisco": true,
+      "dell": false,
+      "hp": false,
+      "microsoft": true,
+      "vmware": true
+    },
+    "geographicCapabilities": {
+      "state": "WV",
+      "regions": ["Mid-Atlantic", "Southeast"],
+      "deliveryLocations": ["West Virginia", "Maryland", "Virginia", "Pennsylvania"],
+      "supportCoverage": "24/7 Federal"
+    },
+    "pastPerformance": {
+      "governmentContracts": [
+        {
+          "contractNumber": "SEWP-V-123456",
+          "agency": "IRS",
+          "value": 2500000,
+          "performancePeriod": "2022-2024",
+          "rating": "Exceptional"
+        }
+      ],
+      "sewpExperience": true,
+      "nasaExperience": false,
+      "gsaSchedule": "70-SIN-1234567"
+    },
+    "businessInfo": {
+      "businessSize": "Small",
+      "employeeCount": 75,
+      "annualRevenue": 15000000,
+      "foundedYear": 2018,
+      "headquarters": {
+        "address": "1234 Tech Drive",
+        "city": "Charleston",
+        "state": "WV",
+        "zip": "25301"
+      }
+    },
+    "technicalCapabilities": {
+      "supportLevel": "24/7 Federal",
+      "installationCapability": true,
+      "maintenanceCapability": true,
+      "trainingCapability": true,
+      "customizationCapability": false
+    },
+    "metadata": {
+      "createdAt": "2025-01-15T10:30:00Z",
+      "updatedAt": "2025-01-15T10:30:00Z",
+      "lastVerified": "2025-01-15T10:30:00Z",
+      "dataSource": "manual",
+      "status": "active"
+    }
+  }
+} 

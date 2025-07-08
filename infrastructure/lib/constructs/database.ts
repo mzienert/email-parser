@@ -39,6 +39,16 @@ export class DatabaseConstruct extends Construct {
       sortKey: { name: 'supplierId', type: dynamodb.AttributeType.STRING },
     });
 
+    // GSI for searching suppliers by business certifications
+    this.supplierTable.addGlobalSecondaryIndex({
+      indexName: 'BusinessCertificationIndex',
+      partitionKey: { name: 'businessCertification', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'supplierId', type: dynamodb.AttributeType.STRING },
+    });
+
+    // Additional GSIs will be added in subsequent deployments due to DynamoDB limitations
+    // TODO: Add GeographicIndex and ComplianceIndex in next deployment phases
+
     // DynamoDB table for match history
     this.matchHistoryTable = new dynamodb.Table(this, 'MatchHistoryTable', {
       tableName: 'match-history',
