@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 export interface StorageConstructProps {
   readonly account: string;
@@ -37,7 +38,40 @@ export class StorageConstruct extends Construct {
         },
       ],
       publicReadAccess: false,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      // Allow public uploads for MVP - NOT for production use
+      blockPublicAccess: new s3.BlockPublicAccess({
+        blockPublicAcls: false,
+        blockPublicPolicy: false,
+        ignorePublicAcls: false,
+        restrictPublicBuckets: false,
+      }),
+      // CORS configuration for web uploads
+      cors: [
+        {
+          allowedMethods: [
+            s3.HttpMethods.GET,
+            s3.HttpMethods.PUT,
+            s3.HttpMethods.POST,
+          ],
+          allowedOrigins: ['*'],
+          allowedHeaders: ['*'],
+          exposedHeaders: ['ETag'],
+          maxAge: 3000,
+        },
+      ],
+      // Notification configuration for processing uploads
+      eventBridgeEnabled: true,
     });
+
+    // Bucket policy to allow public uploads to emails/ directory only
+    this.emailBucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        sid: 'AllowPublicEmailUploads',
+        effect: iam.Effect.ALLOW,
+        principals: [new iam.AnyPrincipal()],
+        actions: ['s3:PutObject'],
+        resources: [`${this.emailBucket.bucketArn}/emails/*`],
+      })
+    );
   }
 } 
