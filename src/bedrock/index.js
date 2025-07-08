@@ -1,4 +1,4 @@
-// Export BedrockHelper for Lambda layer
-const BedrockHelper = require('./bedrockHelper');
+// Export BedrockClient for Lambda layer
+const BedrockClient = require('./BedrockClient');
 
-module.exports = BedrockHelper; 
+module.exports = BedrockClient; 

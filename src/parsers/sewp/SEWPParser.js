@@ -1,5 +1,5 @@
 const IBidParser = require('../IBidParser');
-const BedrockHelper = require('/opt/nodejs/bedrockHelper');
+const BedrockClient = require('/opt/nodejs/BedrockClient');
 
 /**
  * SEWPParser - Specialized parser for SEWP (Solutions for Enterprise-Wide Procurement) emails
@@ -239,17 +239,17 @@ class SEWPParser extends IBidParser {
       };
 
       // Construct the extraction prompt
-      const prompt = BedrockHelper.constructExtractionPrompt(
+      const prompt = BedrockClient.constructExtractionPrompt(
         emailData,
         this.getParserType(),
         responseFormat
       );
 
       // Invoke Bedrock model
-      const extractedData = await BedrockHelper.invokeModel(
+      const extractedData = await BedrockClient.invokeModel(
         this.bedrockClient,
         prompt,
-        BedrockHelper.MODELS.CLAUDE_3_7_SONNET,
+        BedrockClient.MODELS.CLAUDE_3_7_SONNET,
         {
           temperature: 0.1,
           maxTokens: 4000
@@ -257,7 +257,7 @@ class SEWPParser extends IBidParser {
       );
 
       // Validate extraction results
-      const validation = BedrockHelper.validateBedrockExtraction(
+      const validation = BedrockClient.validateBedrockExtraction(
         extractedData,
         this.getParserType()
       );

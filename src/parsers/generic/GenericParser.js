@@ -1,5 +1,5 @@
 const IBidParser = require('../IBidParser');
-const BedrockHelper = require('/opt/nodejs/bedrockHelper');
+const BedrockClient = require('/opt/nodejs/BedrockClient');
 
 /**
  * GenericParser - Fallback parser for unstructured government procurement emails
@@ -393,17 +393,17 @@ class GenericParser extends IBidParser {
       };
 
       // Construct the extraction prompt
-      const prompt = BedrockHelper.constructExtractionPrompt(
+      const prompt = BedrockClient.constructExtractionPrompt(
         emailData,
         this.getParserType(),
         responseFormat
       );
 
       // Invoke Bedrock model - Generic parser relies heavily on Bedrock for unstructured content
-      const extractedData = await BedrockHelper.invokeModel(
+      const extractedData = await BedrockClient.invokeModel(
         this.bedrockClient,
         prompt,
-        BedrockHelper.MODELS.CLAUDE_3_7_SONNET,
+        BedrockClient.MODELS.CLAUDE_3_7_SONNET,
         {
           temperature: 0.1,
           maxTokens: 4000
@@ -411,7 +411,7 @@ class GenericParser extends IBidParser {
       );
 
       // Validate extraction results
-      const validation = BedrockHelper.validateBedrockExtraction(
+      const validation = BedrockClient.validateBedrockExtraction(
         extractedData,
         this.getParserType()
       );
