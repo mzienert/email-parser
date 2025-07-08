@@ -97,6 +97,28 @@ export class LambdaConstruct extends Construct {
       description: 'Email parsing parsers and factory (SEWP, NASA, Generic parsers)',
     });
 
+    // Create Lambda Layer for strategies
+    const strategiesLayer = new lambda.LayerVersion(this, 'StrategiesLayer', {
+      layerVersionName: 'email-parsing-strategies',
+      code: lambda.Code.fromAsset('../src', {
+        bundling: {
+          image: lambda.Runtime.NODEJS_20_X.bundlingImage,
+          user: 'root',
+          command: [
+            'bash', '-c', [
+              'mkdir -p /asset-output/nodejs',
+              'cp -r /asset-input/strategies /asset-output/nodejs/',
+              'cd /asset-output/nodejs',
+              'npm init -y',
+              'npm install'
+            ].join(' && ')
+          ]
+        }
+      }),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
+      description: 'Strategy pattern supplier matching (Fuzzy, Compliance, Geographic)',
+    });
+
     // Bedrock IAM policy for Lambda functions (cross-region inference support)
     const bedrockPolicy = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
@@ -157,19 +179,15 @@ export class LambdaConstruct extends Construct {
       functionName: 'supplier-matcher',
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        exports.handler = async (event) => {
-          console.log('Supplier matcher lambda triggered:', JSON.stringify(event, null, 2));
-          // TODO: Implement Strategy pattern supplier matching
-          return { statusCode: 200, body: 'Suppliers matched' };
-        };
-      `),
+      code: lambda.Code.fromAsset('../src/lambda/supplier-matcher'),
+      layers: [utilitiesLayer, strategiesLayer],
       timeout: cdk.Duration.minutes(3),
       memorySize: 512,
       environment: {
         SUPPLIER_TABLE_NAME: props.supplierTable.tableName,
         MATCH_HISTORY_TABLE_NAME: props.matchHistoryTable.tableName,
         PROCESS_RESULTS_QUEUE_URL: props.processResultsQueue.queueUrl,
+        EVENT_BUS_NAME: props.emailEventBus.eventBusName,
       },
     });
 
@@ -203,5 +221,52 @@ export class LambdaConstruct extends Construct {
 
     // Add Bedrock permissions to relevant Lambda functions
     this.emailParserLambda.addToRolePolicy(bedrockPolicy);
+
+    // Add DynamoDB permissions for supplier matcher
+    const supplierMatcherDynamoPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'dynamodb:Scan',
+        'dynamodb:Query',
+        'dynamodb:GetItem',
+        'dynamodb:PutItem',
+        'dynamodb:UpdateItem',
+      ],
+      resources: [
+        props.supplierTable.tableArn,
+        `${props.supplierTable.tableArn}/*`,
+        props.matchHistoryTable.tableArn,
+        `${props.matchHistoryTable.tableArn}/*`,
+      ],
+    });
+
+    this.supplierMatcherLambda.addToRolePolicy(supplierMatcherDynamoPolicy);
+
+    // Add SQS permissions for supplier matcher
+    const supplierMatcherSQSPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'sqs:SendMessage',
+        'sqs:GetQueueAttributes',
+      ],
+      resources: [
+        props.processResultsQueue.queueArn,
+      ],
+    });
+
+    this.supplierMatcherLambda.addToRolePolicy(supplierMatcherSQSPolicy);
+
+    // Add EventBridge permissions for supplier matcher
+    const supplierMatcherEventBridgePolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'events:PutEvents',
+      ],
+      resources: [
+        props.emailEventBus.eventBusArn,
+      ],
+    });
+
+    this.supplierMatcherLambda.addToRolePolicy(supplierMatcherEventBridgePolicy);
   }
 } 

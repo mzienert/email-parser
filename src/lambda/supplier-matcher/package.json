@@ -1,0 +1,21 @@
+{
+  "name": "supplier-matcher",
+  "version": "1.0.0",
+  "description": "Lambda function for Strategy pattern supplier matching with government compliance filtering",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "@aws-sdk/client-sqs": "^3.0.0",
+    "@aws-sdk/client-eventbridge": "^3.0.0"
+  },
+  "keywords": [
+    "lambda",
+    "supplier-matching",
+    "strategy-pattern",
+    "government-contracting",
+    "compliance-filtering"
+  ],
+  "author": "Email Parser System",
+  "license": "MIT"
+} 
