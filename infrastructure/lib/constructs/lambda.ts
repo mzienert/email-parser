@@ -196,22 +196,10 @@ export class LambdaConstruct extends Construct {
       functionName: 'email-parsing-api',
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        exports.handler = async (event) => {
-          console.log('API lambda triggered:', JSON.stringify(event, null, 2));
-          // TODO: Implement API endpoints
-          return {
-            statusCode: 200,
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({ message: 'API placeholder' }),
-          };
-        };
-      `),
-      timeout: cdk.Duration.minutes(1),
-      memorySize: 256,
+      code: lambda.Code.fromAsset('../src/lambda/api'),
+      layers: [utilitiesLayer],
+      timeout: cdk.Duration.minutes(2),
+      memorySize: 512,
       environment: {
         EMAIL_TABLE_NAME: props.emailTable.tableName,
         SUPPLIER_TABLE_NAME: props.supplierTable.tableName,
@@ -268,5 +256,26 @@ export class LambdaConstruct extends Construct {
     });
 
     this.supplierMatcherLambda.addToRolePolicy(supplierMatcherEventBridgePolicy);
+
+    // Add DynamoDB permissions for API Lambda
+    const apiDynamoPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'dynamodb:GetItem',
+        'dynamodb:Query',
+        'dynamodb:Scan',
+        'dynamodb:PutItem',
+      ],
+      resources: [
+        props.emailTable.tableArn,
+        `${props.emailTable.tableArn}/*`,
+        props.supplierTable.tableArn,
+        `${props.supplierTable.tableArn}/*`,
+        props.matchHistoryTable.tableArn,
+        `${props.matchHistoryTable.tableArn}/*`,
+      ],
+    });
+
+    this.apiLambda.addToRolePolicy(apiDynamoPolicy);
   }
 } 

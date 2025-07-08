@@ -1,0 +1,19 @@
+{
+  "name": "api-handler",
+  "version": "1.0.0",
+  "description": "API Gateway Lambda handler for email parsing system REST endpoints",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0"
+  },
+  "keywords": [
+    "lambda",
+    "api-gateway",
+    "rest-api",
+    "email-parsing",
+    "supplier-matching"
+  ],
+  "author": "Email Parser System",
+  "license": "MIT"
+} 

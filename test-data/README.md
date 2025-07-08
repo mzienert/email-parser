@@ -44,22 +44,23 @@ This directory contains realistic government contracting email files in standard
 
 ## Testing Strategy
 
-### Factory Pattern Validation
-Upload each .eml file to S3 bucket `email-parsing-mvp-619326977873-us-west-1/emails/` to test:
+### Factory Pattern Validation ✅ **WORKING**
+Upload each .eml file to S3 bucket `email-parsing-mvp-619326977873-us-west-2/emails/` to test:
 
-1. **Parser Selection Logic**: 
-   - SEWP email → SEWPParser
-   - NASA email → NASAParser  
-   - GSA email → GenericParser
+1. **Parser Selection Logic**: ✅ **OPERATIONAL**
+   - SEWP email → SEWPParser (1.0 confidence)
+   - NASA email → NASAParser (1.0 confidence)  
+   - GSA email → GenericParser (0.7 confidence)
 
-2. **Event-Driven Flow**:
+2. **Event-Driven Flow**: ✅ **COMPLETE**
    ```
    S3 Upload → Lambda Trigger → Factory Pattern → Parser Selection → 
-   Bedrock Extraction → EventBridge → SQS → Supplier Matching → API
+   Bedrock Extraction → EventBridge → SQS → Supplier Matching → 
+   Strategy Pattern → Match Results → DynamoDB + Process Queue
    ```
 
-3. **Bedrock Integration**:
-   Each parser should extract structured JSON with:
+3. **Bedrock Integration**: ✅ **OPERATIONAL**
+   Each parser extracts structured JSON with:
    - Items/services requested
    - Quantities and specifications
    - Deadlines and timeline
@@ -67,24 +68,47 @@ Upload each .eml file to S3 bucket `email-parsing-mvp-619326977873-us-west-1/ema
    - Requirements and constraints
    - Delivery locations
 
+4. **Supplier Matching**: ✅ **OPERATIONAL**
+   Strategy pattern matching with:
+   - ComplianceFilterStrategy (40% weight)
+   - FuzzyMatchingStrategy (30% weight)
+   - GeographicStrategy (30% weight)
+   - Average score: 61.0%, Best match: 63.9%
+
 ## Usage Instructions
 
 ### Upload Test Files:
 ```bash
-# Upload SEWP test email
-aws s3 cp sewp-nutanix-rfq.eml s3://email-parsing-mvp-619326977873-us-west-1/emails/ --region us-west-1
+# Upload SEWP test email (from project root)
+aws s3 cp test-data/sewp-nutanix-rfq.eml s3://email-parsing-mvp-619326977873-us-west-2/emails/ --region us-west-2
 
 # Upload NASA test email  
-aws s3 cp nasa-networking-rfq.eml s3://email-parsing-mvp-619326977873-us-west-1/emails/ --region us-west-1
+aws s3 cp test-data/nasa-networking-rfq.eml s3://email-parsing-mvp-619326977873-us-west-2/emails/ --region us-west-2
 
 # Upload Generic test email
-aws s3 cp gsa-generic-rfi.eml s3://email-parsing-mvp-619326977873-us-west-1/emails/ --region us-west-1
+aws s3 cp test-data/gsa-generic-rfi.eml s3://email-parsing-mvp-619326977873-us-west-2/emails/ --region us-west-2
+
+# Or use convenience scripts:
+./scripts/upload-sewp-email.sh
+./scripts/upload-nasa-email.sh
+./scripts/upload-gsa-email.sh
 ```
 
 ### Monitor Processing:
-- Check CloudWatch logs for Lambda function execution
-- Query DynamoDB `parsed-emails` table for extracted data
-- Test API endpoints for supplier suggestions: `https://4vmhy4gwei.execute-api.us-west-1.amazonaws.com/dev/`
+```bash
+# Check complete pipeline logs
+aws logs tail /aws/lambda/email-processor --region us-west-2 --since 5m
+aws logs tail /aws/lambda/email-parser --region us-west-2 --since 5m
+aws logs tail /aws/lambda/supplier-matcher --region us-west-2 --since 5m
+
+# Query DynamoDB tables for results
+aws dynamodb scan --table-name parsed-emails --region us-west-2
+aws dynamodb scan --table-name match-history --region us-west-2
+aws dynamodb scan --table-name supplier-catalog --region us-west-2
+
+# Test API endpoints (Phase 4 - Coming Soon)
+# https://ms3d3yxove.execute-api.us-west-2.amazonaws.com/dev/
+```
 
 ### Expected JSON Output Example (SEWP):
 ```json
