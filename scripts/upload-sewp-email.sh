@@ -3,7 +3,7 @@
 # Upload SEWP Nutanix RFQ test email
 BUCKET="email-parsing-mvp-619326977873-us-west-2"
 REGION="us-west-2"
-FILE="../test-data/sewp-nutanix-rfq.eml"
+FILE="test-data/sewp-nutanix-rfq.eml"
 
 echo "Uploading SEWP test email: $FILE"
 echo "Target: s3://$BUCKET/emails/"

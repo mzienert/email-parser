@@ -467,7 +467,8 @@ class NASAParser extends IBidParser {
         validationPassed: validation.isValid,
         extractedFields: Object.keys(extractedData).filter(k => 
           !k.startsWith('bedrock') && extractedData[k] !== null && extractedData[k] !== undefined
-        )
+        ),
+        extractedContent: JSON.stringify(extractedData, null, 2) // Stringify to see nested data
       });
 
       return {

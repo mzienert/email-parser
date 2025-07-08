@@ -173,41 +173,40 @@ Provide only the JSON response with no additional text or explanation.`
     let score = 0.0;
     let maxScore = 0.0;
 
-    // Score key fields based on presence and quality
-    const scoringMap = {
-      // High value fields (0.2 each)
-      contractVehicle: 0.2,
-      procurementNumber: 0.2,
-      technicalRequirements: 0.2,
-      
-      // Medium value fields (0.1 each)
-      complianceRequirements: 0.1,
-      businessRequirements: 0.1,
-      evaluationCriteria: 0.1,
-      
-      // Lower value fields (0.05 each)
-      budgetRange: 0.05,
-      dueDate: 0.05,
-      contactInfo: 0.05,
-      deliveryRequirements: 0.05
-    };
+    // Count non-metadata fields that have actual content
+    const metadataFields = ['bedrockConfidence', 'bedrockProcessedAt', 'bedrockError', 'bedrockValidation'];
+    const dataFields = Object.keys(extractedData).filter(key => 
+      !metadataFields.includes(key) && !key.startsWith('bedrock')
+    );
 
-    for (const [field, weight] of Object.entries(scoringMap)) {
-      maxScore += weight;
+    // Score each field based on content quality
+    for (const field of dataFields) {
+      maxScore += 1.0;
       
       const value = extractedData[field];
       if (value) {
         if (Array.isArray(value) && value.length > 0) {
-          score += weight;
+          // Check if array has meaningful content
+          const hasContent = value.some(item => 
+            (typeof item === 'string' && item.trim().length > 0) ||
+            (typeof item === 'object' && Object.keys(item).length > 0)
+          );
+          if (hasContent) score += 1.0;
         } else if (typeof value === 'string' && value.trim().length > 0) {
-          score += weight;
-        } else if (typeof value === 'object' && Object.keys(value).length > 0) {
-          score += weight;
+          score += 1.0;
+        } else if (typeof value === 'object' && value !== null && Object.keys(value).length > 0) {
+          // Check if object has meaningful content
+          const hasContent = Object.values(value).some(v => 
+            (typeof v === 'string' && v.trim().length > 0) ||
+            (Array.isArray(v) && v.length > 0) ||
+            (typeof v === 'object' && v !== null && Object.keys(v).length > 0)
+          );
+          if (hasContent) score += 1.0;
         }
       }
     }
 
-    return Math.min(score / maxScore, 1.0);
+    return maxScore > 0 ? Math.min(score / maxScore, 1.0) : 0.0;
   }
 
   /**
