@@ -171,8 +171,44 @@ aws lambda get-function --function-name email-processor
 aws events list-rules --event-bus-name email-parsing-events
 ```
 
+## API Endpoints ✅ **OPERATIONAL**
+
+The following REST API endpoints are deployed and functional:
+
+### **POST /suppliers/suggest**
+Real-time supplier suggestions based on requirements:
+```bash
+curl -X POST "https://ms3d3yxove.execute-api.us-west-2.amazonaws.com/dev/suppliers/suggest" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [{"name": "Nutanix software", "category": "software"}],
+    "requirements": {"taaCompliant": true, "businessCertifications": ["HUBZone"]},
+    "preferences": {"state": "WV"}
+  }'
+```
+
+### **GET /emails/{id}/matches**
+Retrieve supplier match results for processed emails:
+```bash
+curl -X GET "https://ms3d3yxove.execute-api.us-west-2.amazonaws.com/dev/emails/sewp-nutanix-rfq/matches"
+```
+
+### **POST /suppliers/feedback**
+Submit feedback on supplier match quality:
+```bash
+curl -X POST "https://ms3d3yxove.execute-api.us-west-2.amazonaws.com/dev/suppliers/feedback" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "emailId": "sewp-nutanix-rfq",
+    "supplierId": "SUPP-001-NUTANIX-RESELLER",
+    "feedback": "good_match",
+    "rating": 4,
+    "comments": "Great supplier match for our requirements"
+  }'
+```
+
 ## Architecture Status
 
-**✅ Phase 1-3 Complete**: Full infrastructure operational with Factory and Strategy patterns implemented.
+**✅ Phase 1-4 Complete**: Full infrastructure operational with Factory and Strategy patterns implemented and REST API endpoints deployed.
 
-**⏳ Phase 4 Next**: API Gateway endpoints for frontend integration.
+**⏳ Phase 5 Next**: React frontend integration with intelligent supplier suggestions.

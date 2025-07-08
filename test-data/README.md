@@ -106,8 +106,16 @@ aws dynamodb scan --table-name parsed-emails --region us-west-2
 aws dynamodb scan --table-name match-history --region us-west-2
 aws dynamodb scan --table-name supplier-catalog --region us-west-2
 
-# Test API endpoints (Phase 4 - Coming Soon)
-# https://ms3d3yxove.execute-api.us-west-2.amazonaws.com/dev/
+# Test API endpoints (Phase 4 - ✅ COMPLETE)
+curl -X POST "https://ms3d3yxove.execute-api.us-west-2.amazonaws.com/dev/suppliers/suggest" \
+  -H "Content-Type: application/json" \
+  -d '{"items":[{"name":"Nutanix software"}],"requirements":{"taaCompliant":true,"businessCertifications":["HUBZone"]},"preferences":{"state":"WV"}}'
+
+curl -X GET "https://ms3d3yxove.execute-api.us-west-2.amazonaws.com/dev/emails/sewp-nutanix-rfq/matches"
+
+curl -X POST "https://ms3d3yxove.execute-api.us-west-2.amazonaws.com/dev/suppliers/feedback" \
+  -H "Content-Type: application/json" \
+  -d '{"emailId":"sewp-nutanix-rfq","supplierId":"SUPP-001","feedback":"good_match","rating":4}'
 ```
 
 ### Expected JSON Output Example (SEWP):
