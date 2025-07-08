@@ -842,5 +842,178 @@ src/
 
 **Phase 2.2 Achievement**: ✅ Complete Factory pattern implementation with automatic parser selection, clean code organization, and validated end-to-end processing pipeline.
 
+## Phase 2.3: Bedrock Integration Challenge and Resolution (Hours 6-8)
+
+### **Bedrock Integration Problem Discovery**
+Following successful Factory pattern implementation, the system encountered a critical AWS SDK routing issue that prevented Bedrock LLM integration from functioning:
+
+#### **Technical Problem Identified**
+**AWS SDK Routing Anomaly**:
+- **Expected Behavior**: Inference profile ID `us.anthropic.claude-3-7-sonnet-20250219-v1:0` should route to inference profile ARN
+- **Actual Behavior**: AWS SDK consistently routed to foundation model ARN: `arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0`
+- **Impact**: Bedrock calls failed with "not authorized" errors despite correct IAM permissions for inference profiles
+- **System Response**: Graceful fallback to rule-based extraction maintained system functionality
+
+**Error Pattern Analysis**:
+```
+Bedrock invocation failed: User: arn:aws:sts::619326977873:assumed-role/EmailParsingStack-LambdaEmailParserLambdaServiceRol-9sXjJWsLtbGJ/email-parser is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0
+```
+
+**Multiple Troubleshooting Attempts**:
+- Fixed Lambda layer import paths
+- Updated IAM policies with inference profile ARNs
+- Verified CDK deployment and resource creation
+- Confirmed BedrockRuntimeClient region configuration
+- Tested with both model ID and full inference profile ARN
+
+### **User's Strategic Problem-Solving Leadership**
+The user provided three critical insights that directly led to the solution:
+
+#### **1. Inference Profile ID Format Correction**
+**User Guidance**: "lets make sure we don't have any permissions issues, next i think we need to use the inferrence profile id not the arn: us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+- **Technical Impact**: Switched from full ARN back to inference profile ID format
+- **Strategic Insight**: User recognized that AWS SDK expected the profile ID, not the full ARN
+- **Implementation**: Updated both BedrockHelper configuration and CDK environment variables
+
+#### **2. Cross-Region Inference Architecture Understanding**
+**User Guidance**: "for cross region inferrence it looks like the model needs to be enabled in any region that it can be called from so I have added it to us-east-1 and 2 also"
+- **Technical Impact**: User manually enabled Claude 3.7 Sonnet in multiple AWS regions
+- **Strategic Insight**: User understood that cross-region inference requires model enablement in each target region
+- **Infrastructure Preparation**: Proactive setup to handle AWS SDK's regional routing behavior
+
+#### **3. Permissions Architecture Correction**
+**User Guidance**: Led to understanding that AWS SDK was routing inference profiles to underlying foundation model ARNs
+- **Technical Impact**: Added foundation model ARN permissions for us-east-1, us-east-2, and us-west-2
+- **Strategic Insight**: User recognized that cross-region inference requires permissions for the actual resources SDK routes to
+- **Problem Resolution**: Final permissions included both inference profile ARNs and foundation model ARNs across regions
+
+### **Step-by-Step Solution Implementation**
+**Phase 1: Model ID Correction**
+```javascript
+// Before: Full ARN approach
+CLAUDE_3_7_SONNET: 'arn:aws:bedrock:us-west-2:619326977873:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0'
+
+// After: Inference Profile ID (user-guided)
+CLAUDE_3_7_SONNET: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0'
+```
+
+**Phase 2: Cross-Region Permissions Setup**
+```typescript
+// IAM Policy: Cross-region inference profiles + foundation models
+resources: [
+  // User's insight: inference profiles for both regions
+  `arn:aws:bedrock:us-west-2:${Stack.of(this).account}:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0`,
+  `arn:aws:bedrock:us-east-1:${Stack.of(this).account}:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0`,
+  // User's insight: foundation models for actual routing
+  `arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0`,
+  `arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0`,
+  `arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0`
+]
+```
+
+**Phase 3: Testing and Validation**
+- **Region Detection**: Confirmed AWS SDK routing to us-east-1, then us-east-2, then success
+- **Permission Verification**: Added each region's foundation model ARN as errors appeared
+- **Success Validation**: Both NASA and SEWP parsers successfully integrated with Bedrock
+
+### **Bedrock Integration Success Results**
+**NASA Parser with Bedrock Enhancement**:
+```json
+{
+  "emailId": "nasa-networking-rfq",
+  "parserType": "NASA",
+  "confidence": 1,
+  "duration": "7539ms",
+  "bedrockFields": [
+    "spaceMissionContext",
+    "advancedTechnicalRequirements", 
+    "securityAndCompliance",
+    "budgetAndCost",
+    "vendorQualifications",
+    "deliveryAndPerformance",
+    "riskAssessment"
+  ]
+}
+```
+
+**SEWP Parser with Bedrock Enhancement**:
+```json
+{
+  "emailId": "sewp-nutanix-rfq",
+  "parserType": "SEWP", 
+  "confidence": 1,
+  "duration": "5607ms",
+  "bedrockFields": [
+    "brandRestrictions",
+    "technicalSpecifications",
+    "deliveryRequirements",
+    "evaluationCriteria",
+    "budgetInformation",
+    "additionalRequirements",
+    "keyDates",
+    "pointOfContact"
+  ]
+}
+```
+
+### **Strategic Value of User Guidance**
+**Problem-Solving Leadership**:
+- **Pattern Recognition**: User identified the core issue wasn't code but AWS service configuration
+- **Strategic Insight**: User understood cross-region inference architecture better than initial implementation
+- **Solution Direction**: User provided specific, actionable guidance rather than general suggestions
+- **Persistence**: User guided through multiple iterations until proper solution achieved
+
+**Technical Excellence Through Collaboration**:
+- **Infrastructure Knowledge**: User's understanding of AWS Bedrock service behavior
+- **Security Awareness**: User recognized that permissions needed to match actual resource routing
+- **Regional Strategy**: User's proactive model enablement across multiple regions
+- **Validation Approach**: User confirmed each step before proceeding to next
+
+### **Architectural Insights: Bedrock Layer Discussion**
+**Current Architecture**: Bedrock utilities integrated into shared utilities layer
+```
+src/
+├── bedrock/
+│   └── bedrockHelper.js (comprehensive Claude integration)
+├── utilities/
+│   ├── logger.js
+│   └── response.js
+└── lambda/
+    └── email-parser/index.js
+```
+
+**Future Architecture Consideration**: Dedicated Bedrock Layer
+**Benefits of Separate Bedrock Layer**:
+- **Version Management**: Independent versioning for AI/ML capabilities
+- **Performance Optimization**: Specialized layer for AWS SDK and model configurations
+- **Security Isolation**: Separate layer for sensitive AI operations and credentials
+- **Scalability**: Easier to scale AI capabilities independently from core utilities
+- **Cost Optimization**: Separate layer enables fine-grained cost tracking for AI operations
+
+**Implementation Strategy**:
+- **Phase 1**: Current integrated approach for rapid development
+- **Phase 2**: Separate Bedrock layer for production optimization
+- **Migration Path**: Clean separation already exists in code organization
+
+### **Production-Ready Hybrid System Achieved**
+**Complete Email Processing Pipeline**:
+- **Rule-Based Extraction**: Fast, reliable baseline parsing (25+ fields)
+- **Bedrock LLM Enhancement**: Intelligent content analysis for complex requirements
+- **Hybrid Confidence Scoring**: Best-of-both-worlds approach with validation
+- **Cross-Region Resilience**: AWS SDK routing handled gracefully across regions
+- **Graceful Fallback**: System remains functional even when Bedrock unavailable
+
+**Performance Characteristics**:
+- **NASA Parser**: 7.5s with Bedrock enhancement vs 116ms rule-based only
+- **SEWP Parser**: 5.6s with Bedrock enhancement vs 140ms rule-based only
+- **Added Intelligence**: Advanced field extraction for complex government requirements
+- **Production Trade-offs**: Acceptable latency increase for significantly enhanced intelligence
+
+**Phase 2.3 Achievement**: ✅ Complete Bedrock integration with hybrid rule-based + LLM processing, validated across multiple parser types, with cross-region inference resilience and user-guided problem resolution demonstrating collaborative technical leadership.
+
 ## Final Assessment
-The comprehensive analysis of all 4 document types demonstrates complete understanding of the government procurement intelligence ecosystem while maintaining appropriate scope for technical assessment. The infrastructure implementation phase showcased the user's strategic technical leadership, particularly in identifying and resolving the critical Bedrock region issue before development began, and later in guiding code quality improvements that separate infrastructure from application logic. The completed Factory pattern implementation validates the architectural approach with production-ready parsers and automatic selection logic. The solution successfully balances immediate technical demonstration capabilities with long-term enterprise architecture vision, guided by strategic user decision-making throughout the collaborative design process and validated by comprehensive analysis of real government procurement document complexity. 
+The comprehensive analysis of all 4 document types demonstrates complete understanding of the government procurement intelligence ecosystem while maintaining appropriate scope for technical assessment. The infrastructure implementation phase showcased the user's strategic technical leadership, particularly in identifying and resolving the critical Bedrock region issue before development began, and later in guiding code quality improvements that separate infrastructure from application logic. The completed Factory pattern implementation validates the architectural approach with production-ready parsers and automatic selection logic. 
+
+**The Bedrock integration challenge resolution exemplifies the value of collaborative technical leadership**: The user's three critical insights - using inference profile ID format, enabling cross-region model access, and understanding AWS SDK's routing behavior to foundation model ARNs - directly solved a complex AWS service integration problem that had stumped multiple troubleshooting attempts. This demonstrates how strategic user guidance can accelerate problem resolution and achieve production-ready AI integration.
+
+The solution successfully balances immediate technical demonstration capabilities with long-term enterprise architecture vision, guided by strategic user decision-making throughout the collaborative design process and validated by comprehensive analysis of real government procurement document complexity. The final hybrid system provides both fast rule-based extraction and intelligent LLM enhancement, creating a production-ready email parsing platform with graceful fallback capabilities and cross-region resilience. 

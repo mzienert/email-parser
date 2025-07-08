@@ -6,7 +6,7 @@ const BidParserFactory = require('/opt/nodejs/factory/BidParserFactory');
 
 // Initialize AWS clients
 const bedrockClient = new BedrockRuntimeClient({ 
-  region: process.env.BEDROCK_REGION || process.env.AWS_REGION 
+  region: 'us-west-2' // Explicitly set to us-west-2 where inference profile is located
 });
 const eventBridge = new EventBridgeClient({ 
   region: process.env.AWS_REGION 

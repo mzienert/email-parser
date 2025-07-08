@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { Stack } from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as events from 'aws-cdk-lib/aws-events';
@@ -96,7 +97,7 @@ export class LambdaConstruct extends Construct {
       description: 'Email parsing parsers and factory (SEWP, NASA, Generic parsers)',
     });
 
-    // Bedrock IAM policy for Lambda functions
+    // Bedrock IAM policy for Lambda functions (cross-region inference support)
     const bedrockPolicy = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
@@ -104,7 +105,13 @@ export class LambdaConstruct extends Construct {
         'bedrock:InvokeModelWithResponseStream',
       ],
       resources: [
-        `arn:aws:bedrock:${props.region}::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0`,
+        // Cross-region inference profiles for Claude 3.7 Sonnet
+        `arn:aws:bedrock:us-west-2:${Stack.of(this).account}:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0`,
+        `arn:aws:bedrock:us-east-1:${Stack.of(this).account}:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0`,
+        // Foundation models (AWS SDK routes inference profiles to these)
+        `arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0`,
+        `arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0`,
+        `arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0`,
         `arn:aws:bedrock:${props.region}::foundation-model/anthropic.claude-4-sonnet-20241022-v1:0`,
         `arn:aws:bedrock:${props.region}::foundation-model/anthropic.claude-4-opus-20241022-v1:0`,
       ],

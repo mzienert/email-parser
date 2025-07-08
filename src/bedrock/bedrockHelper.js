@@ -8,10 +8,11 @@ const { InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
  */
 class BedrockHelper {
   /**
-   * Model configurations with Claude model IDs
+   * Model configurations with Claude model IDs (using inference profiles)
    */
   static MODELS = {
-    CLAUDE_3_7_SONNET: 'anthropic.claude-3-7-sonnet-20250219-v1:0',
+    CLAUDE_3_5_SONNET: 'anthropic.claude-3-5-sonnet-20241022-v2:0',
+    CLAUDE_3_7_SONNET: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
     CLAUDE_SONNET_4: 'anthropic.claude-4-sonnet-20241022-v1:0',  
     CLAUDE_OPUS_4: 'anthropic.claude-4-opus-20241022-v1:0'
   };
